@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+.env
+
+# NodeJS (Artifacts from mistaken npm run)
+node_modules/
+package-lock.json
+package.json
+
+# IDE
+.vscode/
+.idea/
