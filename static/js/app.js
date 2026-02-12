@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         const overlay = document.getElementById('helloOverlay');
         if (overlay) overlay.classList.add('hidden');
-        
+
         const header = document.getElementById('siteHeader');
         if (header) header.classList.add('visible');
     }, 1500);
@@ -250,11 +250,15 @@ async function runSimulation() {
 
 // ==================== RENDER RESULTS ====================
 function renderResults(data) {
-    document.getElementById('welcomeState').style.display = 'none';
-    document.getElementById('summaryCards').style.display = '';
-    document.getElementById('chartsArea').style.display = '';
-    document.getElementById('branchSection').style.display = '';
-    document.getElementById('eventsSection').style.display = '';
+    // Show results sections
+    document.getElementById('results').style.display = 'block';
+    document.getElementById('chartMarquee').style.display = 'block';
+    document.getElementById('charts').style.display = 'block';
+    document.getElementById('branch').style.display = 'block';
+    document.getElementById('events').style.display = 'block';
+
+    // Smooth scroll to results
+    document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
 
     const s = data.summary;
 
@@ -504,7 +508,8 @@ async function runBranch() {
 }
 
 function renderBranchResults(data) {
-    document.getElementById('branchCharts').style.display = '';
+    document.getElementById('branchResults').style.display = 'block';
+    document.getElementById('branchResults').scrollIntoView({ behavior: 'smooth' });
 
     const origDaily = data.original_daily || [];
     const branchDaily = data.branched_daily || [];
@@ -608,3 +613,56 @@ function renderBranchResults(data) {
             </div>`;
     }).join('');
 }
+
+// ==================== CUSTOM CURSOR ====================
+document.addEventListener('DOMContentLoaded', () => {
+    const dot = document.getElementById('cursorDot');
+    const ring = document.getElementById('cursorRing');
+
+    if (!dot || !ring) return;
+
+    let mouseX = 0;
+    let mouseY = 0;
+    let ringX = 0;
+    let ringY = 0;
+
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+
+        // Immediate dot movement
+        dot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
+    });
+
+    // Smooth ring movement
+    function animateRing() {
+        // Linear interpolation for smooth trailing
+        ringX += (mouseX - ringX) * 0.15;
+        ringY += (mouseY - ringY) * 0.15;
+
+        ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
+        requestAnimationFrame(animateRing);
+    }
+    animateRing();
+
+    // Hover effects
+    const interactiveElements = document.querySelectorAll('a, button, input, select, .input-row, .summary-card, .chart-card');
+
+    interactiveElements.forEach(el => {
+        el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+        el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+    });
+
+    // Dynamic hover for dynamically added elements (delegation)
+    document.body.addEventListener('mouseover', (e) => {
+        if (e.target.matches('button, a, input, select, .btn-remove')) {
+            document.body.classList.add('cursor-hover');
+        }
+    });
+    document.body.addEventListener('mouseout', (e) => {
+        if (e.target.matches('button, a, input, select, .btn-remove')) {
+            document.body.classList.remove('cursor-hover');
+        }
+    });
+});
+
